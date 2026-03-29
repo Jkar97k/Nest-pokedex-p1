@@ -25,6 +25,12 @@ npm i -g @nestjs/cli
 ```
 dokcer-compose up -d
 ```
+5. recosntruir la BD 
+
+```
+http://{baseurl}/api/v2/seed
+
+```
 
 ## Stack usado
 * MongoDb
