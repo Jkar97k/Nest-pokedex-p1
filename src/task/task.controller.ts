@@ -22,9 +22,9 @@ export class TaskController {
     return this.taskService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.taskService.update(+id, updateTaskDto);
+  @Patch(':email')
+  update(@Param('email') email: string, @Body() updateTaskDto: UpdateTaskDto) {
+    return this.taskService.update(email, updateTaskDto);
   }
 
   @Delete(':id')

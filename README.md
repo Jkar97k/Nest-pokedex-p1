@@ -1,37 +1,176 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <a href="http://nestjs.com/" target="blank">
+    <img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" />
+  </a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<p align="center">
+  A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.
+</p>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
+# 🧩 Proyecto NestJS - Auth & Tasks
 
+---
 
-# Ejecutar en desarrollo
-1. Clonar el repositoria
-2. Ejecutar
-```
-npm install
-```
+# 🚀 Guía de Inicio
 
-3. tener NEST-CLI instalado
-```
+## 📋 Requisitos Previos
+
+Tener **Nest CLI** instalado globalmente:
+
+```bash
 npm i -g @nestjs/cli
 ```
 
-4. Levantar la base de datos
+---
+
+## ⚙️ Instalación y Configuración
+
+### 1. Clonar el repositorio e instalar dependencias
+
+```bash
+npm install
 ```
-dokcer-compose up -d
+
+---
+
+## 🗄️ Configuración de Prisma y Base de Datos
+
+Este proyecto utiliza **Prisma v7** con PostgreSQL.
+
+```bash
+# Instalación de Prisma CLI
+npm install prisma --save-dev
+
+# Inicializar Prisma (crea carpeta prisma y .env)
+npx prisma init
+
+# Cliente y adaptador PostgreSQL
+npm install @prisma/client @prisma/adapter-pg
+
+# Generar cliente de Prisma
+npx prisma generate
 ```
-5. recosntruir la BD 
+
+---
+
+## ⚠️ Configuración IMPORTANTE Prisma v7
+
+### 🔧 Generator (solución error ESModules)
+
+En tu archivo `schema.prisma`, agrega:
+
+```prisma
+generator client {
+  provider      = "prisma-client-js"
+  moduleFormat  = "cjs"
+}
+```
+
+Esto evita errores como:
+```
+ReferenceError: exports is not defined in ES module scope
+```
+
+---
+
+### 🔐 Solución SSL PostgreSQL (Render / Supabase / Neon)
+
+En tu `PrismaService` debes configurar el adaptador con SSL:
+
+```ts
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+@Injectable()
+export class PrismaService extends PrismaClient implements OnModuleInit {
+  constructor() {
+    const pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false, // Permite certificados autofirmados
+      },
+    });
+
+    const adapter = new PrismaPg(pool);
+
+    super({ adapter });
+  }
+
+  async onModuleInit() {
+    await this.$connect();
+  }
+}
+```
+
+---
+
+## 🔐 Variables de Entorno y Configuración
+
+```bash
+npm install @nestjs/config dotenv
+```
+
+---
+
+## 🔑 Autenticación y Seguridad
+
+```bash
+# JWT
+npm install @nestjs/jwt passport-jwt
+
+# Bcrypt (hash de contraseñas)
+npm install bcrypt
+npm install --save-dev @types/bcrypt
+```
+
+---
+
+## ▶️ Ejecución en Desarrollo
+
+### Levantar base de datos (requiere Docker)
+
+```bash
+docker-compose up -d
+```
+
+### Ejecutar migraciones
+
+```bash
+npx prisma migrate dev --name init
+```
+
+### Seed de la base de datos
+
+Accede a:
 
 ```
 http://{baseurl}/api/v2/seed
-
 ```
 
-## Stack usado
-* MongoDb
-* Nestjs
+### Iniciar la aplicación
+
+```bash
+npm run start:dev
+```
+
+---
+
+## 🧰 Stack Tecnológico
+
+- **Framework:** NestJS  
+- **ORM:** Prisma v7  
+- **Base de Datos:** PostgreSQL (Docker)  
+- **Autenticación:** JWT + Bcrypt  
+
+---
+
+## 📝 Notas adicionales
+
+> 💡 **TIP**
+>
+> Configura correctamente tu `DATABASE_URL` en el archivo `.env` antes de ejecutar las migraciones de Prisma.
+>
+> Si usas proveedores como Render, Supabase o Neon, asegúrate de habilitar SSL como se muestra arriba.
