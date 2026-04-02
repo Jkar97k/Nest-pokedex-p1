@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  moduleFormat = "cjs"
+
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model comment_reactions {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id       String?   @db.Uuid
+  comment_id    String?   @db.Uuid
+  reaction_type String?   @db.VarChar(20)
+  created_at    DateTime? @db.Timestamp(6)
+  comments      comments? @relation(fields: [comment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users         users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model comments {
+  id                  String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  post_id             String?             @db.Uuid
+  user_id             String?             @db.Uuid
+  parent_comment_id   String?             @db.Uuid
+  description_comment String?
+  status              status_enum         @default(active)
+  created_at          DateTime?           @db.Timestamp(6)
+  updated_at          DateTime?           @db.Timestamp(6)
+  comment_reactions   comment_reactions[]
+  comments            comments?           @relation("commentsTocomments", fields: [parent_comment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_comments      comments[]          @relation("commentsTocomments")
+  posts               posts?              @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users               users?              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([status], map: "idx_comments_status")
+}
+
+model messages {
+  id                                String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sender_id                         String?     @db.Uuid
+  receiver_id                       String?     @db.Uuid
+  content                           String?
+  read                              Boolean?
+  read_at                           DateTime?   @db.Timestamp(6)
+  status                            status_enum @default(active)
+  created_at                        DateTime?   @db.Timestamp(6)
+  updated_at                        DateTime?   @db.Timestamp(6)
+  users_messages_receiver_idTousers users?      @relation("messages_receiver_idTousers", fields: [receiver_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_messages_sender_idTousers   users?      @relation("messages_sender_idTousers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model notifications {
+  id                                   String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id                              String?     @db.Uuid
+  sender_id                            String?     @db.Uuid
+  type                                 String?     @db.VarChar(50)
+  reference_id                         String?     @db.Uuid
+  reference_type                       String?     @db.VarChar(50)
+  content                              String?
+  read                                 Boolean?
+  read_at                              DateTime?   @db.Timestamp(6)
+  status                               status_enum @default(active)
+  created_at                           DateTime?   @db.Timestamp(6)
+  users_notifications_sender_idTousers users?      @relation("notifications_sender_idTousers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_notifications_user_idTousers   users?      @relation("notifications_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model post_media {
+  id         String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  post_id    String? @db.Uuid
+  media_url  String?
+  media_type String? @db.VarChar(20)
+  posts      posts?  @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model post_reactions {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id       String?   @db.Uuid
+  post_id       String?   @db.Uuid
+  reaction_type String?   @db.VarChar(20)
+  created_at    DateTime? @db.Timestamp(6)
+  posts         posts?    @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users         users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model post_types {
+  id    Int     @id @default(autoincrement())
+  name  String? @db.VarChar(50)
+  posts posts[]
+}
+
+model posts {
+  id               String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id          String?          @db.Uuid
+  post_type_id     Int?
+  description_post String?
+  location         String?          @db.VarChar(255)
+  status           status_enum      @default(active)
+  created_at       DateTime?        @db.Timestamp(6)
+  updated_at       DateTime?        @db.Timestamp(6)
+  deleted_at       DateTime?        @db.Timestamp(6)
+  comments         comments[]
+  post_media       post_media[]
+  post_reactions   post_reactions[]
+  post_types       post_types?      @relation(fields: [post_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users            users?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([status, deleted_at], map: "idx_posts_active")
+  @@index([status], map: "idx_posts_status")
+}
+
+model relationships {
+  id                                      String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  follower_id                             String?     @db.Uuid
+  following_id                            String?     @db.Uuid
+  status                                  status_enum @default(active)
+  created_at                              DateTime?   @db.Timestamp(6)
+  updated_at                              DateTime?   @db.Timestamp(6)
+  users_relationships_follower_idTousers  users?      @relation("relationships_follower_idTousers", fields: [follower_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_relationships_following_idTousers users?      @relation("relationships_following_idTousers", fields: [following_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id                                              String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email                                           String?             @unique @db.VarChar(255)
+  username                                        String?             @unique @db.VarChar(50)
+  password_hash                                   String?             @db.VarChar(255)
+  first_name                                      String?             @db.VarChar(100)
+  last_name                                       String?             @db.VarChar(100)
+  bio                                             String?
+  avatar_url                                      String?
+  birth_date                                      DateTime?           @db.Date
+  gender                                          String?             @db.VarChar(20)
+  phone                                           String?             @db.VarChar(20)
+  privacy                                         Boolean?
+  receive_notifications                           Boolean?
+  last_login                                      DateTime?           @db.Timestamp(6)
+  status                                          status_enum         @default(active)
+  created_at                                      DateTime?           @db.Timestamp(6)
+  updated_at                                      DateTime?           @db.Timestamp(6)
+  deleted_at                                      DateTime?           @db.Timestamp(6)
+  comment_reactions                               comment_reactions[]
+  comments                                        comments[]
+  messages_messages_receiver_idTousers            messages[]          @relation("messages_receiver_idTousers")
+  messages_messages_sender_idTousers              messages[]          @relation("messages_sender_idTousers")
+  notifications_notifications_sender_idTousers    notifications[]     @relation("notifications_sender_idTousers")
+  notifications_notifications_user_idTousers      notifications[]     @relation("notifications_user_idTousers")
+  post_reactions                                  post_reactions[]
+  posts                                           posts[]
+  relationships_relationships_follower_idTousers  relationships[]     @relation("relationships_follower_idTousers")
+  relationships_relationships_following_idTousers relationships[]     @relation("relationships_following_idTousers")
+
+  @@index([status], map: "idx_users_status")
+}
+
+enum status_enum {
+  inactive
+  active
+}
