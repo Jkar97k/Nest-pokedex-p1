@@ -1,7 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { users } from "generated/prisma/client";
+import { Prisma, users } from "generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdateTaskDto } from "../dto/update-task.dto";
+import { CreateTaskDto } from "../dto/create-task.dto";
+
 
 
 @Injectable()
@@ -32,4 +34,15 @@ export class TaskRepository {
             throw new Error('Error updating user');
         }
     }
+
+    // users/repositories/users.repository.ts
+        async createUser(data: Prisma.usersCreateInput): Promise<users> { // Luego cambiaremos 'any' por un tipo específico de Prisma
+        return await this.prisma.users.create({data});
+        }
+
+        async deleteUser(email: string): Promise<void> {
+            await this.prisma.users.delete({
+                where: { email },
+            });
+        }
 }

@@ -1,10 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { TaskService } from 'src/task/task.service';
 import { EncrypAdapter } from 'src/common/Adapters/encryp.adapter';
 import { AuthenticationService } from './authentication/authentication.service';
 import { loginDto } from './dto/Login.dto';
+import { RegisterDto } from './dto/register.dto';
+import e from 'express';
+import { CreateTaskDto } from 'src/task/dto/create-task.dto';
 
 
 
@@ -61,4 +64,48 @@ export class AuthService {
     return { token };
   }
 
+  // auth/auth.service.ts
+  async signUp(registerDto: RegisterDto) {
+    try {
+      
+      const { password,email,birth_date, ...userData } = registerDto;
+
+      console.log('userData:', userData);
+
+      // 1. Verificar si el email o username ya existen
+      const existingUser = await this.taskService.findOneForAuth(email);
+
+      if (existingUser) {
+        throw new BadRequestException('El correo ya está registrado');
+      }
+
+      // 2. Hashear la contraseña
+      const passwordHash = await this.encrypAdapter.hashPassword(password);
+
+      const createUserDto: CreateTaskDto = {
+          ...userData,
+          password_hash: passwordHash,
+          email: email,
+          // Convertimos el string ISO a objeto Date de JS
+          birth_date: birth_date ? new Date(birth_date) : undefined,
+        };
+
+      // 3. Guardar en la base de datos a través del repositorio
+      // (Asumiendo que creas un método en usersService que llame al repository)
+      return  await this.taskService.create(createUserDto);
+    } 
+    catch (error) {
+      throw new BadRequestException('Error al registrar el usuario: ' + error.message);
+    }
+
+  }
+
+  async deleteUser(email: string) {
+    try {
+     return await this.taskService.remove(email);
+       
+    } catch (error) {
+      throw new BadRequestException('Error al eliminar el usuario: ' + error.message);
+    }
+  }
 }

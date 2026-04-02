@@ -26,9 +26,4 @@ export class TaskController {
   update(@Param('email') email: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.taskService.update(email, updateTaskDto);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.taskService.remove(+id);
-  }
 }

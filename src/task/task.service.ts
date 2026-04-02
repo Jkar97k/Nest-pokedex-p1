@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -16,7 +16,12 @@ export class TaskService {
   ) {}
 
   create(createTaskDto: CreateTaskDto) {
-    return 'This action adds a new task';
+    try {
+      return this.taskRepository.createUser(createTaskDto);  
+    } 
+    catch (error) {
+      throw new BadRequestException('Error al crear la tarea: ' + error.message);
+    }
   }
 
   async findAll(): Promise<users[]> {
@@ -57,8 +62,12 @@ export class TaskService {
 
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(email: string) {
+
+
+     await this.taskRepository.deleteUser(email);
+
+    return { message: `User with email ${email} has been deleted` };
   }
 
   // users.service.ts

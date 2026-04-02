@@ -1,65 +1,41 @@
-import { 
-  IsEmail, 
-  IsString, 
-  IsOptional, 
-  IsBoolean, 
-  IsDateString, 
-  MinLength, 
-  IsUrl,
-  IsPhoneNumber,
-  IsNotEmpty
-} from 'class-validator';
-
 export class CreateTaskDto {
+  email: string;
+  username: string;
+  password_hash: string;
+  first_name?: string;
+  last_name?: string;
+  bio?: string;
+  avatar_url?: string;
+  birth_date?: Date;
+  gender?: string;
+  phone?: string;
+  privacy?: boolean;
+  receive_notifications?: boolean;
 
-    @IsEmail({host_whitelist: ['pascualbravo.edu.co']}, { message: 'El formato del correo es inválido' })
-    @IsNotEmpty()
-    email: string;
+  // constructor(data: Partial<CreateTaskDto>) {
+  //   // Campos obligatorios: mantenemos el fallback a string vacío para evitar errores
+  //   this.email = data.email?.toLowerCase().trim() ?? '';
+  //   this.username = data.username?.toLowerCase().trim() ?? '';
+  //   this.password_hash = data.password_hash ?? '';
 
-    @IsString()
-    @MinLength(3)
-    @IsOptional()
-    username: string;
+  //   // Campos opcionales: es mejor que sean undefined si no vienen, 
+  //   // así Prisma guarda NULL en la DB y no un "" (string vacío).
+  //   this.first_name = data.first_name?.toLowerCase().trim();
+  //   this.last_name = data.last_name?.toLowerCase().trim();
+  //   this.bio = data.bio?.trim();
+  //   this.avatar_url = data.avatar_url?.trim();
+  //   this.gender = data.gender?.toLowerCase().trim();
+  //   this.phone = data.phone?.trim();
 
-    @IsString()
-    @IsNotEmpty()
-    @IsOptional()
-    first_name: string;
+  //   // Manejo de booleanos (valores por defecto)
+  //   this.privacy = data.privacy ?? false;
+  //   this.receive_notifications = data.receive_notifications ?? true;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsOptional()
-    last_name: string;
-
-    @IsString()
-    @IsOptional()
-    bio?: string;
-
-    @IsUrl()
-    @IsOptional()
-    avatar_url?: string;
-
-    @IsDateString()
-    @IsOptional()
-    birth_date?: Date;
-
-    @IsString()
-    @IsOptional()
-    gender?: string;
-
-    //@IsPhoneNumber() // 'null' permite detectar el país automáticamente por el prefijo (+57, etc)
-    @IsOptional()
-    phone?: string;
-
-    @IsBoolean()
-    @IsOptional()
-    privacy: boolean = true;
-
-    @IsBoolean()
-    @IsOptional()
-    receive_notifications: boolean = true;
-
-    @IsString()
-    //@MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
-    password_hash: string;
+  //   // Validación de fecha
+  //   if (data.birth_date) {
+  //     const date = new Date(data.birth_date);
+  //     // Validamos que la fecha sea real (que no sea "Invalid Date")
+  //     this.birth_date = isNaN(date.getTime()) ? undefined : date;
+  //   }
+  // }
 }
