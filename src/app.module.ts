@@ -9,15 +9,18 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { TaskModule } from './task/task.module';
 import { AuthModule } from './auth/auth.module';
+import { envConfig } from './config/env.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      load: [envConfig]
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname,'..','public'),
       }),
     PokemonModule,
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/nest-pokemon'),
+    MongooseModule.forRoot(envConfig().mongodbUri),
     CommonModule,
     SeedModule,
     PrismaModule,
