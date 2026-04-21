@@ -9,16 +9,15 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PokemonService {
-  private defaultLimit: number | undefined;
+  private defaultLimit: number;
 
   constructor(
 
     @InjectModel(Pokemon.name)
     private readonly pokemonModel: Model<Pokemon>,
-
     private readonly ConfigService: ConfigService
   ) {
-    this.defaultLimit = this.ConfigService.get<number>('defaultLimit');
+    this.defaultLimit = this.ConfigService.getOrThrow<number>('defaultLimit');
   }
 
   async create(createPokemonDto: CreatePokemonDto) {
@@ -38,7 +37,7 @@ export class PokemonService {
 
   findAll(PaginationDto: PaginationDto) {
 
-    const { limit = this.defaultLimit!, offset = 0 } = PaginationDto;
+    const { limit = this.defaultLimit, offset = 0 } = PaginationDto;
 
     return this.pokemonModel.find().limit(limit).skip(offset).sort({ no: 1 }).select('-__v');
 

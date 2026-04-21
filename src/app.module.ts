@@ -10,15 +10,17 @@ import { ConfigModule } from '@nestjs/config';
 import { TaskModule } from './task/task.module';
 import { AuthModule } from './auth/auth.module';
 import { envConfig } from './config/env.config';
+import { JoiValidationSchema } from './config/joi.validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [envConfig]
+      load: [envConfig],
+      validationSchema: JoiValidationSchema,
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname,'..','public'),
-      }),
+      }), 
     PokemonModule,
     MongooseModule.forRoot(envConfig().mongodbUri),
     CommonModule,
