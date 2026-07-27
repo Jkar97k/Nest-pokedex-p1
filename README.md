@@ -29,7 +29,7 @@ npm i -g @nestjs/cli
 ### 1. Clonar el repositorio e instalar dependencias
 
 ```bash
-npm install
+pnpm i
 ```
 
 ---
@@ -40,16 +40,16 @@ Este proyecto utiliza **Prisma v7** con PostgreSQL.
 
 ```bash
 # Instalación de Prisma CLI
-npm install prisma --save-dev
+pnpm add prisma --save-dev
 
 # Inicializar Prisma (crea carpeta prisma y .env)
-npx prisma init
+pnpm exec prisma init
 
 # Cliente y adaptador PostgreSQL
-npm install @prisma/client @prisma/adapter-pg
+pnpm add  @prisma/client @prisma/adapter-pg
 
 # Generar cliente de Prisma
-npx prisma generate
+pnpm exec prisma generate
 ```
 
 ---
@@ -110,7 +110,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 ## 🔐 Variables de Entorno y Configuración
 
 ```bash
-npm install @nestjs/config dotenv
+pnpm add @nestjs/config dotenv
 ```
 
 ---
@@ -119,11 +119,11 @@ npm install @nestjs/config dotenv
 
 ```bash
 # JWT
-npm install @nestjs/jwt passport-jwt
+pnpm add @nestjs/jwt passport-jwt
 
 # Bcrypt (hash de contraseñas)
-npm install bcrypt
-npm install --save-dev @types/bcrypt
+pnpm add bcrypt
+pnpm add --save-dev @types/bcrypt
 ```
 
 ---
@@ -139,7 +139,7 @@ docker-compose up -d
 ### Ejecutar migraciones
 
 ```bash
-npx prisma migrate dev --name init
+pnpm exec prisma migrate dev --name init
 ```
 
 ### Seed de la base de datos
@@ -153,7 +153,7 @@ http://{baseurl}/api/v2/seed
 ### Iniciar la aplicación
 
 ```bash
-npm run start:dev
+pnpm start:dev
 ```
 
 ---
